@@ -1,0 +1,13 @@
+version: "3"
+services:
+
+  mysql:
+    image: mysql:8.0.15
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: mochoten
+      MYSQL_DATABASE: sealion
+      MYSQL_USER: kenji
+      MYSQL_PASSWORD: kenji

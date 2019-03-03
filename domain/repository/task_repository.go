@@ -6,5 +6,5 @@ import (
 )
 
 type TaskRepository interface {
-	getAll(ctx context.Context) (*model.Task, error)
+	GetAll(ctx context.Context) ([]model.Task, error)
 }

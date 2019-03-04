@@ -34,3 +34,49 @@ func (r *TaskRepository) GetAll(ctx context.Context) ([]model.Task, error) {
 	}
 	return tasks, nil
 }
+
+func (r *TaskRepository) Add(ctx context.Context, task model.Task) (int64, error) {
+	sql := `INSERT INTO tasks (category, name, do_today, deadline) VALUES (?, ?, ?, ?)`
+
+	stmt, err := r.Conn.Prepare(sql)
+	if err != nil {
+		return 0, err
+	}
+	row, err := stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline)
+	if err != nil {
+		return 0, err
+	}
+
+	lastInsertID, err := row.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return lastInsertID, nil
+}
+
+func (r *TaskRepository) Update(ctx context.Context, task model.Task) error {
+	sql := `UPDATE tasks SET category=?, name=?, do_today=?, deadline=? WHERE id = ?`
+	stmt, err := r.Conn.Prepare(sql)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *TaskRepository) Delete(ctx context.Context, id int64) error {
+	sql := `DELETE FROM tasks WHERE id = ?`
+	stmt, err := r.Conn.Prepare(sql)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

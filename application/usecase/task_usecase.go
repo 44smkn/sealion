@@ -7,7 +7,7 @@ import (
 )
 
 type TaskUseCase interface {
-	GetTaskList(ctx context.Context) (*model.Tasks, error)
+	GetTasks(ctx context.Context) (*model.Tasks, error)
 }
 
 type taskUseCase struct {
@@ -18,6 +18,6 @@ func NewTaskUseCase(r repository.TaskRepository) TaskUseCase {
 	return &taskUseCase{r}
 }
 
-func (u *taskUseCase) GetTaskList(ctx context.Context) (*model.Tasks, error) {
+func (u *taskUseCase) GetTasks(ctx context.Context) (*model.Tasks, error) {
 	return nil, nil
 }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"sealion/application/usecase"
 )
@@ -20,7 +21,10 @@ type taskHandler struct {
 	u usecase.TaskUseCase
 }
 
-type errorHandler struct{}
+type errorHandler struct {
+	cause string
+	code  int
+}
 
 func NewTaskHandler(u usecase.TaskUseCase) TaskHandler {
 	return &taskHandler{u}
@@ -32,7 +36,12 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		tasks, err := t.u.GetTasks(ctx)
 		if err != nil {
-			// something
+			log.Println(err)
+			eh := &errorHandler{
+				cause: "failed to get tasks from db",
+				code:  http.StatusInternalServerError,
+			}
+			eh.ServeHTTP(w, r)
 		}
 		respondWithJson(w, http.StatusOK, tasks)
 	default:
@@ -41,7 +50,7 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
+	respondWithJson(w, e.code, struct{ cause string }{cause: e.cause})
 }
 
 func respondWithJson(w http.ResponseWriter, code int, v interface{}) {

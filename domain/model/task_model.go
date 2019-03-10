@@ -2,8 +2,6 @@ package model
 
 import "time"
 
-type Tasks []Task
-
 type Task struct {
 	Id       int       `json:"id"`
 	Category string    `json:"category"`

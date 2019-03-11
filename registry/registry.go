@@ -1,9 +1,13 @@
 package registry
 
 import (
+	"log"
 	"net/http"
 	"sealion/application/usecase"
+	"sealion/config"
 	"sealion/domain/repository"
+	"sealion/infrastructure/persistence/datastore"
+	"sealion/interfaces/handler"
 )
 
 type Registry interface {
@@ -18,10 +22,22 @@ type registry struct {
 	taskHandler http.Handler
 }
 
-func NewRegistry() registry {
-
+func NewRegistry() *registry {
+	return &registry{}
 }
 
 func (r *registry) NewTaskRepository() repository.TaskRepository {
+	conn, err := config.GetDbConn()
+	if err != nil {
+		log.Fatal("failed to new connection: ", err)
+	}
+	return datastore.NewTaskRepository(conn)
+}
 
+func (r *registry) NewTaskUseCase() usecase.TaskUseCase {
+	return usecase.NewTaskUseCase(r.taskrepo)
+}
+
+func (r *registry) NewAppHandler() http.Handler {
+	return handler.NewTaskHandler(r.taskuse)
 }

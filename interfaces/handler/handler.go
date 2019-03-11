@@ -1,4 +1,4 @@
-package interfaces
+package handler
 
 import (
 	"bytes"
@@ -15,6 +15,7 @@ type AppHandler interface {
 }
 
 type TaskHandler interface {
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
 type taskHandler struct {

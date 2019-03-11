@@ -1,9 +1,9 @@
 package main
 
 import (
-	"sealion/interfaces"
+	"sealion/interfaces/router"
 )
 
 func main() {
-	interfaces.Run(8080)
+	router.Run(8080)
 }

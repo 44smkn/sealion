@@ -4,7 +4,6 @@ import (
 	"context"
 	"sealion/domain/model"
 	"sealion/domain/repository"
-	"sealion/infrastructure/persistence/datastore"
 )
 
 type TaskUseCase interface {
@@ -20,8 +19,7 @@ func NewTaskUseCase(r repository.TaskRepository) TaskUseCase {
 }
 
 func (u *taskUseCase) GetTasks(ctx context.Context) ([]*model.Task, error) {
-	r := datastore.NewTaskRepository(u.Conn)
-	tasks, err := r.GetAll(ctx)
+	tasks, err := u.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}

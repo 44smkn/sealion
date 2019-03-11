@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"sealion/application/usecase"
@@ -56,11 +54,9 @@ func (e *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func respondWithJson(w http.ResponseWriter, code int, v interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	var body *bytes.Buffer
-	encoder := json.NewEncoder(body)
-	err := encoder.Encode(v)
+	body, err := json.Marshal(v)
 	if err != nil {
 		// something
 	}
-	io.Copy(w, body)
+	w.Write(body)
 }

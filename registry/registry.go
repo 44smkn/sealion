@@ -23,21 +23,34 @@ type registry struct {
 }
 
 func NewRegistry() *registry {
-	return &registry{}
+	r := &registry{}
+	r.NewTaskRepository()
+	r.NewTaskUseCase()
+	r.NewAppHandler()
+	return r
 }
 
 func (r *registry) NewTaskRepository() repository.TaskRepository {
-	conn, err := config.GetDbConn()
-	if err != nil {
-		log.Fatal("failed to new connection: ", err)
+	if r.taskrepo == nil {
+		conn, err := config.GetDbConn()
+		if err != nil {
+			log.Fatal("failed to new connection: ", err)
+		}
+		r.taskrepo = datastore.NewTaskRepository(conn)
 	}
-	return datastore.NewTaskRepository(conn)
+	return r.taskrepo
 }
 
 func (r *registry) NewTaskUseCase() usecase.TaskUseCase {
-	return usecase.NewTaskUseCase(r.taskrepo)
+	if r.taskuse == nil {
+		r.taskuse = usecase.NewTaskUseCase(r.taskrepo)
+	}
+	return r.taskuse
 }
 
 func (r *registry) NewAppHandler() http.Handler {
-	return handler.NewTaskHandler(r.taskuse)
+	if r.taskHandler == nil {
+		r.taskHandler = handler.NewTaskHandler(r.taskuse)
+	}
+	return r.taskHandler
 }

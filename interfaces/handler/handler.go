@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sealion/application/usecase"
+	"sealion/domain/model"
 )
 
 type AppHandler interface {
@@ -43,6 +44,27 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			eh.ServeHTTP(w, r)
 		}
 		respondWithJson(w, http.StatusOK, tasks)
+	case http.MethodPost:
+		decoder := json.NewDecoder(r.Body)
+		defer r.Body.Close()
+		var task model.Task
+		if err := decoder.Decode(&task); err != nil {
+			log.Println(err)
+			eh := &errorHandler{
+				cause: "failed to parse json request body",
+				code:  http.StatusBadRequest,
+			}
+			eh.ServeHTTP(w, r)
+		}
+		if err := t.u.CreateTask(ctx, task); err != nil {
+			log.Println(err)
+			eh := &errorHandler{
+				cause: "failed to create task",
+				code:  http.StatusInternalServerError,
+			}
+			eh.ServeHTTP(w, r)
+		}
+		respondWithJson(w, http.StatusOK, task)
 	default:
 		w.WriteHeader(http.StatusNotFound)
 	}

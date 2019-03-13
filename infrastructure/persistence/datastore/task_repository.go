@@ -61,7 +61,7 @@ func (r *TaskRepository) Update(ctx context.Context, task model.Task) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline)
+	_, err = stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline, task.Id)
 	if err != nil {
 		return err
 	}

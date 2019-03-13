@@ -9,6 +9,7 @@ import (
 type TaskUseCase interface {
 	GetTasks(ctx context.Context) ([]*model.Task, error)
 	CreateTask(ctx context.Context, task model.Task) error
+	UpdateTask(ctx context.Context, task model.Task) error
 }
 
 type taskUseCase struct {
@@ -29,6 +30,14 @@ func (u *taskUseCase) GetTasks(ctx context.Context) ([]*model.Task, error) {
 
 func (u *taskUseCase) CreateTask(ctx context.Context, task model.Task) error {
 	_, err := u.Add(ctx, task)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *taskUseCase) UpdateTask(ctx context.Context, task model.Task) error {
+	err := u.Update(ctx, task)
 	if err != nil {
 		return err
 	}

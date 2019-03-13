@@ -45,21 +45,26 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		respondWithJson(w, http.StatusOK, tasks)
 	case http.MethodPost:
-		decoder := json.NewDecoder(r.Body)
-		defer r.Body.Close()
 		var task model.Task
-		if err := decoder.Decode(&task); err != nil {
-			log.Println(err)
-			eh := &errorHandler{
-				cause: "failed to parse json request body",
-				code:  http.StatusBadRequest,
-			}
-			eh.ServeHTTP(w, r)
-		}
+		decodeBody(w, r, &task)
+
 		if err := t.u.CreateTask(ctx, task); err != nil {
 			log.Println(err)
 			eh := &errorHandler{
 				cause: "failed to create task",
+				code:  http.StatusInternalServerError,
+			}
+			eh.ServeHTTP(w, r)
+		}
+		respondWithJson(w, http.StatusOK, task)
+	case http.MethodPut:
+		var task model.Task
+		decodeBody(w, r, &task)
+
+		if err := t.u.UpdateTask(ctx, task); err != nil {
+			log.Println(err)
+			eh := &errorHandler{
+				cause: "failed to update task",
 				code:  http.StatusInternalServerError,
 			}
 			eh.ServeHTTP(w, r)
@@ -81,4 +86,17 @@ func respondWithJson(w http.ResponseWriter, code int, v interface{}) {
 		// something
 	}
 	w.Write(body)
+}
+
+func decodeBody(w http.ResponseWriter, r *http.Request, v interface{}) {
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	if err := decoder.Decode(v); err != nil {
+		log.Println(err)
+		eh := &errorHandler{
+			cause: "failed to parse json request body",
+			code:  http.StatusBadRequest,
+		}
+		eh.ServeHTTP(w, r)
+	}
 }

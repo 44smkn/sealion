@@ -1,5 +1,11 @@
 package service
 
-type TaskService interface{}
+type TaskService interface {
+	SyncJira() error
+}
 
 type taskService struct{}
+
+func (s *taskService) SyncJira() error {
+	return nil
+}

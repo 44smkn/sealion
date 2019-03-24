@@ -10,6 +10,7 @@ type TaskUseCase interface {
 	GetTasks(ctx context.Context) ([]*model.Task, error)
 	CreateTask(ctx context.Context, task model.Task) error
 	UpdateTask(ctx context.Context, task model.Task) error
+	DeleteTask(ctx context.Context, id int64) error
 }
 
 type taskUseCase struct {
@@ -38,6 +39,14 @@ func (u *taskUseCase) CreateTask(ctx context.Context, task model.Task) error {
 
 func (u *taskUseCase) UpdateTask(ctx context.Context, task model.Task) error {
 	err := u.Update(ctx, task)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *taskUseCase) DeleteTask(ctx context.Context, id int64) error {
+	err := u.Delete(ctx, id)
 	if err != nil {
 		return err
 	}

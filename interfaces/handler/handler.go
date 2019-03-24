@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 	"sealion/application/usecase"
 	"sealion/domain/model"
+	"strings"
 )
 
 type AppHandler interface {
@@ -70,6 +72,25 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			eh.ServeHTTP(w, r)
 		}
 		respondWithJson(w, http.StatusOK, task)
+	case http.MethodDelete:
+		url := strings.Split(r.RequestURI, "/")
+		parameter := url[len(url)-1]
+		if reflect.TypeOf(parameter).Kind() != reflect.Int {
+			eh := &errorHandler{
+				cause: "failed to parse url parameter",
+				code:  http.StatusBadRequest,
+			}
+			eh.ServeHTTP(w, r)
+		}
+		if err := t.u.DeleteTask(ctx, id); err != nil {
+			log.Println(err)
+			eh := &errorHandler{
+				cause: "failed to delete task",
+				code:  http.StatusInternalServerError,
+			}
+			eh.ServeHTTP(w, r)
+		}
+		respondWithJson(w, http.StatusOK, nil)
 	default:
 		respondWithJson(w, http.StatusNotFound, fmt.Sprintf("{\"cause\": \"method %v is not found\"}", r.Method))
 	}

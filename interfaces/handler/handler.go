@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sealion/application/usecase"
@@ -47,7 +48,6 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		var task model.Task
 		decodeBody(w, r, &task)
-
 		if err := t.u.CreateTask(ctx, task); err != nil {
 			log.Println(err)
 			eh := &errorHandler{
@@ -71,7 +71,7 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		respondWithJson(w, http.StatusOK, task)
 	default:
-		w.WriteHeader(http.StatusNotFound)
+		respondWithJson(w, http.StatusNotFound, fmt.Sprintf("{\"cause\": \"method %v is not found\"}", r.Method))
 	}
 }
 
@@ -81,6 +81,9 @@ func (e *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func respondWithJson(w http.ResponseWriter, code int, v interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,PATCH,OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 	body, err := json.Marshal(v)
 	if err != nil {
 		// something

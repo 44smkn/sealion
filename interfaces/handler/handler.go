@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 	"sealion/application/usecase"
 	"sealion/domain/model"
+	"strconv"
 	"strings"
 )
 
@@ -74,15 +74,15 @@ func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		respondWithJson(w, http.StatusOK, task)
 	case http.MethodDelete:
 		url := strings.Split(r.RequestURI, "/")
-		parameter := url[len(url)-1]
-		if reflect.TypeOf(parameter).Kind() != reflect.Int {
+		parameter, err := strconv.ParseInt(url[len(url)-1], 10, 32)
+		if err != nil {
 			eh := &errorHandler{
 				cause: "failed to parse url parameter",
 				code:  http.StatusBadRequest,
 			}
 			eh.ServeHTTP(w, r)
 		}
-		if err := t.u.DeleteTask(ctx, id); err != nil {
+		if err := t.u.DeleteTask(ctx, parameter); err != nil {
 			log.Println(err)
 			eh := &errorHandler{
 				cause: "failed to delete task",

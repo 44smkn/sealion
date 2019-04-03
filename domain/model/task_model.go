@@ -9,5 +9,5 @@ type Task struct {
 	DoToday     bool      `json:"doToday"`
 	Deadline    time.Time `json:"deadline"`
 	Description string    `json:"description"`
-	TicketId    string    `json:"ticketid,omitempty"`
+	TicketId    string    `json:"ticketId,omitempty"`
 }

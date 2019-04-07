@@ -2,8 +2,11 @@ package usecase
 
 import (
 	"context"
+	"log"
+	"os"
 	"sealion/domain/model"
 	"sealion/domain/repository"
+	"sealion/domain/service"
 )
 
 type TaskUseCase interface {
@@ -15,13 +18,24 @@ type TaskUseCase interface {
 
 type taskUseCase struct {
 	repository.TaskRepository
+	service.TaskService
 }
 
-func NewTaskUseCase(r repository.TaskRepository) TaskUseCase {
-	return &taskUseCase{r}
+func NewTaskUseCase(r repository.TaskRepository, s service.TaskService) TaskUseCase {
+	return &taskUseCase{r, s}
 }
 
 func (u *taskUseCase) GetTasks(ctx context.Context) ([]*model.Task, error) {
+	if os.Getenv("SYNC_JIRA_ISSUE") == "on" {
+		existedTasks, _ := u.GetTickets(ctx)
+		jira, err := u.SyncJira(ctx, existedTasks)
+		if err != nil {
+			log.Println(err)
+		}
+		for _, j := range jira {
+			u.Add(ctx, j)
+		}
+	}
 	tasks, err := u.GetAll(ctx)
 	if err != nil {
 		return nil, err

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"sealion/domain/model"
 	"sealion/domain/service"
 	"sealion/infrastructure/client"
 	"testing"
@@ -20,5 +21,9 @@ func TestSyncJira(t *testing.T) {
 	}
 	s := service.NewTaskService(*c)
 	ctx := context.Background()
-	s.SyncJira(ctx)
+	existedTasks := []*model.Task{}
+	_, err = s.SyncJira(ctx, existedTasks)
+	if err != nil {
+		t.Error(err)
+	}
 }

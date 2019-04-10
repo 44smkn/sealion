@@ -10,4 +10,5 @@ type Task struct {
 	Deadline    time.Time `json:"deadline"`
 	Description string    `json:"description"`
 	TicketId    string    `json:"ticketId,omitempty"`
+	Archive     bool      `json:"archive"`
 }

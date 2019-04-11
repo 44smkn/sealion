@@ -23,16 +23,11 @@ func (r *TaskRepository) GetAll(ctx context.Context) ([]*model.Task, error) {
 		return nil, err
 	}
 
-	var tasks []*model.Task
-	for rows.Next() {
-		var t model.Task
-		err = rows.Scan(&t.Id, &t.Category, &t.Name, &t.DoToday, &t.Deadline)
-		if err != nil {
-			return nil, err
-		}
-		tasks = append(tasks, &t)
+	list, err := toTaskList(rows)
+	if err != nil {
+		return nil, err
 	}
-	return tasks, nil
+	return list, nil
 }
 
 func (r *TaskRepository) Add(ctx context.Context, task model.Task) (int64, error) {
@@ -79,4 +74,30 @@ func (r *TaskRepository) Delete(ctx context.Context, id int64) error {
 		return err
 	}
 	return nil
+}
+
+func (r *TaskRepository) GetTickets(ctx context.Context) ([]*model.Task, error) {
+	rows, err := r.Conn.Query("SELECT id, category, name, do_today, deadline FROM tasks WHERE category = 'TICKET'")
+	if err != nil {
+		return nil, err
+	}
+
+	list, err := toTaskList(rows)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+func toTaskList(rows *sql.Rows) ([]*model.Task, error) {
+	var tasks []*model.Task
+	for rows.Next() {
+		var t model.Task
+		err := rows.Scan(&t.Id, &t.Category, &t.Name, &t.DoToday, &t.Deadline)
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, &t)
+	}
+	return tasks, nil
 }

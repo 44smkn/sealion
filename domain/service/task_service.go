@@ -12,10 +12,10 @@ type TaskService interface {
 }
 
 type taskService struct {
-	client.JiraClient
+	*client.JiraClient
 }
 
-func NewTaskService(c client.JiraClient) TaskService {
+func NewTaskService(c *client.JiraClient) TaskService {
 	return &taskService{c}
 }
 

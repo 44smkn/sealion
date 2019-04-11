@@ -33,7 +33,10 @@ func (u *taskUseCase) GetTasks(ctx context.Context) ([]*model.Task, error) {
 			log.Println(err)
 		}
 		for _, j := range jira {
-			u.Add(ctx, j)
+			_, err := u.Add(ctx, *j)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	tasks, err := u.GetAll(ctx)

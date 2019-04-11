@@ -19,7 +19,7 @@ func TestSyncJira(t *testing.T) {
 	if err != nil {
 		log.Println(err)
 	}
-	s := service.NewTaskService(*c)
+	s := service.NewTaskService(c)
 	ctx := context.Background()
 	existedTasks := []*model.Task{}
 	_, err = s.SyncJira(ctx, existedTasks)

@@ -15,16 +15,18 @@ import (
 
 var createTable = `
 CREATE TABLE IF NOT EXISTS tasks (
-	 id      INTEGER PRIMARY KEY AUTO_INCREMENT
-	,category VARCHAR(255)
-    ,name     VARCHAR(255)
-	,do_today boolean
-	,deadline DATE
+	 id        INTEGER PRIMARY KEY AUTO_INCREMENT
+	,category  VARCHAR(255)
+    ,name      VARCHAR(255)
+	,do_today  boolean
+	,deadline  DATE
+	,ticket_id VARCHAR(255)
+	,archive   boolean
 );
 `
 var insertRecord = `
-INSERT INTO tasks (category, name, do_today, deadline)
-    VALUES (?, ?, ?, ?)
+INSERT INTO tasks (category, name, do_today, deadline, ticket_id, archive)
+    VALUES (?, ?, ?, ?, ?, ?)
 `
 
 func check(err error) {
@@ -39,7 +41,7 @@ func TestGetAll(t *testing.T) {
 
 	defer conn.Close()
 	initTable(conn)
-	defer dropTable(conn)
+	//defer dropTable(conn)
 	initRecords(conn)
 
 	ctx := context.Background()
@@ -70,10 +72,10 @@ func initRecords(conn *sql.DB) {
 	check(err)
 	defer stmt.Close()
 
-	_, err = stmt.Exec("TICKETS", "Prometheusの設定変更", true, "2019-03-04")
+	_, err = stmt.Exec("TICKETS", "Prometheusの設定変更", true, "2019-03-04", "MICROUD-1242", false)
 	check(err)
 
-	_, err = stmt.Exec("CHORE", "健康診断の申し込み", false, "2019-03-07")
+	_, err = stmt.Exec("CHORE", "健康診断の申し込み", false, "2019-03-07", "NULL", false)
 	check(err)
 }
 

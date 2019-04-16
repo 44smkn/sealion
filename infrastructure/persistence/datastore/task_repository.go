@@ -18,7 +18,7 @@ func NewTaskRepository(conn *sql.DB) repository.TaskRepository {
 }
 
 func (r *TaskRepository) GetAll(ctx context.Context) ([]*model.Task, error) {
-	rows, err := r.Conn.Query("SELECT id, category, name, do_today, deadline FROM tasks")
+	rows, err := r.Conn.Query("SELECT id, category, name, do_today, deadline, ticket_id, archive FROM tasks")
 	if err != nil {
 		return nil, err
 	}
@@ -31,13 +31,13 @@ func (r *TaskRepository) GetAll(ctx context.Context) ([]*model.Task, error) {
 }
 
 func (r *TaskRepository) Add(ctx context.Context, task model.Task) (int64, error) {
-	sql := `INSERT INTO tasks (category, name, do_today, deadline) VALUES (?, ?, ?, ?)`
+	sql := `INSERT INTO tasks (category, name, do_today, deadline, ticket_id, archive) VALUES (?, ?, ?, ?, ?, ?)`
 
 	stmt, err := r.Conn.Prepare(sql)
 	if err != nil {
 		return 0, err
 	}
-	row, err := stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline)
+	row, err := stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline, task.TicketId, task.Archive)
 	if err != nil {
 		return 0, err
 	}
@@ -51,12 +51,12 @@ func (r *TaskRepository) Add(ctx context.Context, task model.Task) (int64, error
 }
 
 func (r *TaskRepository) Update(ctx context.Context, task model.Task) error {
-	sql := `UPDATE tasks SET category=?, name=?, do_today=?, deadline=? WHERE id = ?`
+	sql := `UPDATE tasks SET category=?, name=?, do_today=?, deadline=?, ticket_id=?, archive=? WHERE id = ?`
 	stmt, err := r.Conn.Prepare(sql)
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline, task.Id)
+	_, err = stmt.Exec(task.Category, task.Name, task.DoToday, task.Deadline, task.TicketId, task.Archive, task.Id)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (r *TaskRepository) Delete(ctx context.Context, id int64) error {
 }
 
 func (r *TaskRepository) GetTickets(ctx context.Context) ([]*model.Task, error) {
-	rows, err := r.Conn.Query("SELECT id, category, name, do_today, deadline FROM tasks WHERE category = 'TICKET'")
+	rows, err := r.Conn.Query("SELECT id, category, name, do_today, deadline, ticket_id, archive FROM tasks WHERE category = 'TICKET'")
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func toTaskList(rows *sql.Rows) ([]*model.Task, error) {
 	var tasks []*model.Task
 	for rows.Next() {
 		var t model.Task
-		err := rows.Scan(&t.Id, &t.Category, &t.Name, &t.DoToday, &t.Deadline)
+		err := rows.Scan(&t.Id, &t.Category, &t.Name, &t.DoToday, &t.Deadline, &t.TicketId, &t.Archive)
 		if err != nil {
 			return nil, err
 		}

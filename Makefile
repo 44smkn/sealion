@@ -1,3 +1,6 @@
 start:
-	docker-compose up -d mysql
-	docker exec mysql mysql -u kenji -pkenji sealion < ./_sql/create_table.sql
+	docker-compose up --build -d mysql 
+	sleep 30s
+	cat ./_sql/create_table.sql | docker exec -i mysql mysql -u root -pmochoten sealion 
+down:
+	docker-compose down

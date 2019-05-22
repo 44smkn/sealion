@@ -3,101 +3,63 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"sealion/application/usecase"
 	"sealion/domain/model"
-	"strconv"
-	"strings"
 )
 
-type AppHandler interface {
-	TaskHandler
-}
+type Handler interface {}
 
-type TaskHandler interface {
-	ServeHTTP(w http.ResponseWriter, r *http.Request)
-}
-
-type taskHandler struct {
+type handler struct {
 	u usecase.TaskUseCase
 }
 
-type errorHandler struct {
-	cause string
-	code  int
-}
 
-func NewTaskHandler(u usecase.TaskUseCase) TaskHandler {
-	return &taskHandler{u}
-}
-
-func (t *taskHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h handler) GetTasks(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	switch r.Method {
-	case http.MethodGet:
-		tasks, err := t.u.GetTasks(ctx)
+	tasks, err := h.u.GetTasks(ctx)
 		if err != nil {
 			log.Println(err)
-			eh := &errorHandler{
-				cause: "failed to get tasks from db",
-				code:  http.StatusInternalServerError,
-			}
-			eh.ServeHTTP(w, r)
+			respondError(w, http.StatusInternalServerError,"failed to get tasks from db")
 		}
-		respondWithJson(w, http.StatusOK, tasks)
-	case http.MethodPost:
-		var task model.Task
-		decodeBody(w, r, &task)
-		if err := t.u.CreateTask(ctx, task); err != nil {
-			log.Println(err)
-			eh := &errorHandler{
-				cause: "failed to create task",
-				code:  http.StatusInternalServerError,
-			}
-			eh.ServeHTTP(w, r)
-		}
-		respondWithJson(w, http.StatusOK, task)
-	case http.MethodPut:
-		var task model.Task
-		decodeBody(w, r, &task)
-
-		if err := t.u.UpdateTask(ctx, task); err != nil {
-			log.Println(err)
-			eh := &errorHandler{
-				cause: "failed to update task",
-				code:  http.StatusInternalServerError,
-			}
-			eh.ServeHTTP(w, r)
-		}
-		respondWithJson(w, http.StatusOK, task)
-	case http.MethodDelete:
-		url := strings.Split(r.RequestURI, "/")
-		parameter, err := strconv.ParseInt(url[len(url)-1], 10, 32)
-		if err != nil {
-			eh := &errorHandler{
-				cause: "failed to parse url parameter",
-				code:  http.StatusBadRequest,
-			}
-			eh.ServeHTTP(w, r)
-		}
-		if err := t.u.DeleteTask(ctx, parameter); err != nil {
-			log.Println(err)
-			eh := &errorHandler{
-				cause: "failed to delete task",
-				code:  http.StatusInternalServerError,
-			}
-			eh.ServeHTTP(w, r)
-		}
-		respondWithJson(w, http.StatusOK, nil)
-	default:
-		respondWithJson(w, http.StatusNotFound, fmt.Sprintf("{\"cause\": \"method %v is not found\"}", r.Method))
-	}
+	respondWithJson(w, http.StatusOK, tasks)
 }
 
-func (e *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	respondWithJson(w, e.code, struct{ cause string }{cause: e.cause})
+func (h handler) CreateTasks(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	var task model.Task
+	decodeBody(w, r, &task)
+	if err := h.u.CreateTask(ctx, task); err != nil {
+		log.Println(err)
+		respondError(w, http.StatusInternalServerError,"failed to create task")
+	}
+	respondWithJson(w, http.StatusOK, task)
+}
+
+func (h handler) UpdateTasks(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	var task model.Task
+	decodeBody(w, r, &task)
+	if err := h.u.UpdateTask(ctx, task); err != nil {
+		log.Println(err)
+		respondError(w, http.StatusInternalServerError,"failed to update task")
+	}
+	respondWithJson(w, http.StatusOK, task)
+}
+
+func (h handler) DeleteTasks(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	tasks, err := h.u.DeleteTask(ctx, param)
+		if err != nil {
+			log.Println(err)
+			respondError(w, http.StatusInternalServerError,"failed to delete task")
+		}
+	respondWithJson(w, http.StatusOK, tasks)
+}
+
+func respondError(w http.ResponseWriter, code int, cause string) {
+	respondWithJson(w, code, struct{ cause string }{cause: cause})
 }
 
 func respondWithJson(w http.ResponseWriter, code int, v interface{}) {
@@ -117,10 +79,6 @@ func decodeBody(w http.ResponseWriter, r *http.Request, v interface{}) {
 	defer r.Body.Close()
 	if err := decoder.Decode(v); err != nil {
 		log.Println(err)
-		eh := &errorHandler{
-			cause: "failed to parse json request body",
-			code:  http.StatusBadRequest,
-		}
-		eh.ServeHTTP(w, r)
+		respondError(w, http.StatusBadRequest, "failed to parse json request body")
 	}
 }

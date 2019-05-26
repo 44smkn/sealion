@@ -52,5 +52,14 @@ func inject() *Container {
 	}
 	container.Register(ud)
 
+	h := &Definition{
+		Name: "Handler",
+		Builder: func(c *Container) interface{} {
+			uc, _ := c.Get("TaskUseCase").(usecase.TaskUseCase)
+			return handler.NewHandler(uc)
+		},
+	}
+	container.Register(h)
+
 	return container
 }

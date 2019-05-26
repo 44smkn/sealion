@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"strconv"
+	"github.com/gorilla/mux"
 	"context"
 	"encoding/json"
 	"log"
@@ -9,12 +11,20 @@ import (
 	"sealion/domain/model"
 )
 
-type Handler interface {}
+type Handler interface {
+	GetTasks(w http.ResponseWriter, r *http.Request)
+	CreateTasks(w http.ResponseWriter, r *http.Request) 
+	UpdateTasks(w http.ResponseWriter, r *http.Request)
+	DeleteTasks(w http.ResponseWriter, r *http.Request)
+}
 
 type handler struct {
 	u usecase.TaskUseCase
 }
 
+func NewHandler(u usecase.TaskUseCase) Handler {
+	return &handler{u: u}
+}
 
 func (h handler) GetTasks(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
@@ -50,12 +60,14 @@ func (h handler) UpdateTasks(w http.ResponseWriter, r *http.Request) {
 
 func (h handler) DeleteTasks(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	tasks, err := h.u.DeleteTask(ctx, param)
+	vars := mux.Vars(r)
+	id, _ := strconv.ParseInt(vars["id"], 0, 64)
+	err := h.u.DeleteTask(ctx, id)
 		if err != nil {
 			log.Println(err)
 			respondError(w, http.StatusInternalServerError,"failed to delete task")
 		}
-	respondWithJson(w, http.StatusOK, tasks)
+	respondWithJson(w, http.StatusOK, nil)
 }
 
 func respondError(w http.ResponseWriter, code int, cause string) {

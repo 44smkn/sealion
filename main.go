@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"sealion/interfaces/router"
 )
 
 func main() {
-	router.Run(8080)
+	port := flag.Int("port", 8080, "port to listen http request")
+	router.Run(*port)
 }

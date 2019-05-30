@@ -11,22 +11,22 @@ import (
 	"sealion/domain/model"
 )
 
-type Handler interface {
-	GetTasks(w http.ResponseWriter, r *http.Request)
-	CreateTasks(w http.ResponseWriter, r *http.Request) 
-	UpdateTasks(w http.ResponseWriter, r *http.Request)
-	DeleteTasks(w http.ResponseWriter, r *http.Request)
+type TaskHandler interface {
+	Get(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request) 
+	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
 }
 
-type handler struct {
+type taskHandler struct {
 	u usecase.TaskUseCase
 }
 
-func NewHandler(u usecase.TaskUseCase) Handler {
-	return &handler{u: u}
+func NewTaskHandler(u usecase.TaskUseCase) TaskHandler {
+	return &taskHandler{u: u}
 }
 
-func (h handler) GetTasks(w http.ResponseWriter, r *http.Request) {
+func (h taskHandler) Get(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	tasks, err := h.u.GetTasks(ctx)
 		if err != nil {
@@ -36,7 +36,7 @@ func (h handler) GetTasks(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tasks)
 }
 
-func (h handler) CreateTasks(w http.ResponseWriter, r *http.Request) {
+func (h taskHandler) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	var task model.Task
 	decodeBody(w, r, &task)
@@ -47,7 +47,7 @@ func (h handler) CreateTasks(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, task)
 }
 
-func (h handler) UpdateTasks(w http.ResponseWriter, r *http.Request) {
+func (h taskHandler) Update(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	var task model.Task
 	decodeBody(w, r, &task)
@@ -58,7 +58,7 @@ func (h handler) UpdateTasks(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, task)
 }
 
-func (h handler) DeleteTasks(w http.ResponseWriter, r *http.Request) {
+func (h taskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 0, 64)

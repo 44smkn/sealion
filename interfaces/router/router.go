@@ -10,12 +10,12 @@ import (
 
 func Run(port int) error {
 
-	h, _ := registry.Store.Get("Handler").(handler.Handler)
+	th, _ := registry.Store.Get("TaskHandler").(handler.TaskHandler)
 	r := mux.NewRouter()
-	r.HandleFunc("/api/tasks", h.GetTasks).Methods("GET")
-	r.HandleFunc("/api/tasks", h.CreateTasks).Methods("POST")
-	r.HandleFunc("/api/tasks", h.UpdateTasks).Methods("PUT")
-	r.HandleFunc("/api/tasks/{id}", h.DeleteTasks).Methods("DELETE")
+	r.HandleFunc("/api/tasks", th.Get).Methods("GET")
+	r.HandleFunc("/api/tasks", th.Create).Methods("POST")
+	r.HandleFunc("/api/tasks", th.Update).Methods("PUT")
+	r.HandleFunc("/api/tasks/{id}", th.Delete).Methods("DELETE")
 
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 }

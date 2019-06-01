@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sealion/interfaces/handler"
 	"sealion/registry"
+
 	"github.com/gorilla/mux"
 )
 
@@ -16,6 +17,7 @@ func Run(port int) error {
 	r.HandleFunc("/api/tasks", th.Create).Methods("POST")
 	r.HandleFunc("/api/tasks", th.Update).Methods("PUT")
 	r.HandleFunc("/api/tasks/{id}", th.Delete).Methods("DELETE")
+	http.Handle("/", r)
 
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 }

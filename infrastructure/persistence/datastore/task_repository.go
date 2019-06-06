@@ -7,13 +7,16 @@ import (
 	"sealion/domain/repository"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/wire"
 )
+
+var Set = wire.NewSet(ProvideTaskRepository)
 
 type TaskRepository struct {
 	Conn *sql.DB
 }
 
-func NewTaskRepository(conn *sql.DB) repository.TaskRepository {
+func ProvideTaskRepository(conn *sql.DB) repository.TaskRepository {
 	return &TaskRepository{Conn: conn}
 }
 

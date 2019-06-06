@@ -8,9 +8,12 @@ import (
 	"sealion/domain/model"
 	"strconv"
 
+	"github.com/google/wire"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
+
+var Set = wire.NewSet(ProvideTaskHandler)
 
 type TaskHandler interface {
 	Get(w http.ResponseWriter, r *http.Request)
@@ -23,7 +26,7 @@ type taskHandler struct {
 	u usecase.TaskUseCase
 }
 
-func NewTaskHandler(u usecase.TaskUseCase) TaskHandler {
+func ProvideTaskHandler(u usecase.TaskUseCase) TaskHandler {
 	return &taskHandler{u: u}
 }
 

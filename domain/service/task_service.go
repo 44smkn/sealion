@@ -5,7 +5,11 @@ import (
 	"log"
 	"sealion/domain/model"
 	"sealion/infrastructure/client"
+
+	"github.com/google/wire"
 )
+
+var Set = wire.NewSet(ProvideTaskService)
 
 type TaskService interface {
 	SyncJira(ctx context.Context, existedTasks []*model.Task) ([]*model.Task, error)
@@ -15,7 +19,7 @@ type taskService struct {
 	*client.JiraClient
 }
 
-func NewTaskService(c *client.JiraClient) TaskService {
+func ProvideTaskService(c *client.JiraClient) TaskService {
 	return &taskService{c}
 }
 

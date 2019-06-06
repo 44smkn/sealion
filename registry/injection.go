@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"log"
 	"os"
 	"sealion/application/usecase"
@@ -10,6 +11,8 @@ import (
 	"sealion/infrastructure/client"
 	"sealion/infrastructure/persistence/datastore"
 	"sealion/interfaces/handler"
+
+	"github.com/google/wire"
 )
 
 var Store *Container = inject()
@@ -62,4 +65,14 @@ func inject() *Container {
 	container.Register(h)
 
 	return container
+}
+
+func InitializeApp(ctx context.Context, flags *cliFlags) (*application, func(), error) {
+	wire.Build(
+		handler.Set,
+		usecase.Set,
+		service.Set,
+		datastore.Set,
+	)
+	return nil, nil, nil
 }

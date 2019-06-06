@@ -7,7 +7,11 @@ import (
 	"sealion/domain/model"
 	"sealion/domain/repository"
 	"sealion/domain/service"
+
+	"github.com/google/wire"
 )
+
+var Set = wire.NewSet(ProvideTaskUseCase)
 
 type TaskUseCase interface {
 	GetTasks(ctx context.Context) ([]*model.Task, error)
@@ -21,7 +25,7 @@ type taskUseCase struct {
 	service.TaskService
 }
 
-func NewTaskUseCase(r repository.TaskRepository, s service.TaskService) TaskUseCase {
+func ProvideTaskUseCase(r repository.TaskRepository, s service.TaskService) TaskUseCase {
 	return &taskUseCase{r, s}
 }
 

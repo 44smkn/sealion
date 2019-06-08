@@ -12,7 +12,10 @@ func main() {
 	port := flag.Int("port", 8080, "port to listen http request")
 	debugEnabled := flag.Bool("debug", false, "enable debug output in logs")
 
-	th := initialize()
+	th, err := initialize()
+	if err != nil {
+		log.Fatal(err)
+	}
 	if *debugEnabled {
 		logrus.SetLevel(logrus.DebugLevel)
 	}

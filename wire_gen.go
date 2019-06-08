@@ -16,12 +16,18 @@ import (
 
 // Injectors from wire.go:
 
-func initialize() handler.TaskHandler {
-	db := config.GetDbConn()
+func initialize() (handler.TaskHandler, error) {
+	db, err := config.GetDbConn()
+	if err != nil {
+		return nil, err
+	}
 	taskRepository := datastore.ProvideTaskRepository(db)
-	jiraClient := client.NewJira()
+	jiraClient, err := client.NewJira()
+	if err != nil {
+		return nil, err
+	}
 	taskService := service.ProvideTaskService(jiraClient)
 	taskUseCase := usecase.ProvideTaskUseCase(taskRepository, taskService)
 	taskHandler := handler.ProvideTaskHandler(taskUseCase)
-	return taskHandler
+	return taskHandler, nil
 }

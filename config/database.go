@@ -18,18 +18,16 @@ type DbConfig struct {
 	Port     string `default:"3306"`
 }
 
-func GetDbConn() *sql.DB {
+func GetDbConn() (*sql.DB, error) {
 	var d DbConfig
 	err := envconfig.Process("mysql", &d)
 	if err != nil {
-		// TODO: error handling
-		return nil
+		return nil, err
 	}
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/sealion?parseTime=true", d.User, d.Password, d.Host, d.Port)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		// TODO: error handling
-		return nil
+		return nil, err
 	}
-	return db
+	return db, nil
 }

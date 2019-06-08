@@ -32,25 +32,22 @@ type auth struct {
 	} `json:"session"`
 }
 
-func NewJira() *JiraClient {
+func NewJira() (*JiraClient, error) {
 	urlStr := os.Getenv("JIRA_BASE_URL")
 	username := os.Getenv("JIRA_USERNAME")
 	password := os.Getenv("JIRA_PASSWORD")
 
 	if len(username) == 0 {
-		// TODO: error handling
-		return nil
+		return nil, errors.New("missing  username")
 	}
 
 	if len(password) == 0 {
-		// TODO: error handling
-		return nil
+		return nil, errors.New("missing user password")
 	}
 
 	parsedURL, err := url.ParseRequestURI(urlStr)
 	if err != nil {
-		// TODO: error handling
-		return nil
+		return nil, errors.Wrapf(err, "failed to parse url: %s", urlStr)
 	}
 
 	httpClient := &http.Client{}
@@ -61,7 +58,7 @@ func NewJira() *JiraClient {
 		Password:   password,
 		HTTPClient: httpClient,
 	}
-	return client
+	return client, nil
 
 }
 

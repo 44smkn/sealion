@@ -13,7 +13,7 @@ import (
 	"github.com/google/wire"
 )
 
-func initialize() (th handler.TaskHandler) {
+func initialize() (th handler.TaskHandler, err error) {
 
 	wire.Build(
 		config.Set,

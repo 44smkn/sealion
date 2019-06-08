@@ -8,11 +8,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"sealion/domain/model"
 
+	"github.com/google/wire"
 	"github.com/pkg/errors"
 )
+
+var Set = wire.NewSet(NewJira)
 
 type JiraClient struct {
 	URL        *url.URL
@@ -28,18 +32,25 @@ type auth struct {
 	} `json:"session"`
 }
 
-func NewJira(urlStr, username, password string) (*JiraClient, error) {
+func NewJira() *JiraClient {
+	urlStr := os.Getenv("JIRA_BASE_URL")
+	username := os.Getenv("JIRA_USERNAME")
+	password := os.Getenv("JIRA_PASSWORD")
+
 	if len(username) == 0 {
-		return nil, errors.New("missing  username")
+		// TODO: error handling
+		return nil
 	}
 
 	if len(password) == 0 {
-		return nil, errors.New("missing user password")
+		// TODO: error handling
+		return nil
 	}
 
 	parsedURL, err := url.ParseRequestURI(urlStr)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse url: %s", urlStr)
+		// TODO: error handling
+		return nil
 	}
 
 	httpClient := &http.Client{}
@@ -50,7 +61,7 @@ func NewJira(urlStr, username, password string) (*JiraClient, error) {
 		Password:   password,
 		HTTPClient: httpClient,
 	}
-	return client, nil
+	return client
 
 }
 

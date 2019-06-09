@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sealion/interfaces/handler"
+
 	//"sealion/registry"
 
 	"github.com/gorilla/mux"
@@ -11,7 +12,6 @@ import (
 
 func Run(port int, th handler.TaskHandler) error {
 
-	//th, _ := registry.Store.Get("TaskHandler").(handler.TaskHandler)
 	r := mux.NewRouter()
 	r.HandleFunc("/api/tasks", th.Get).Methods("GET")
 	r.HandleFunc("/api/tasks", th.Create).Methods("POST")

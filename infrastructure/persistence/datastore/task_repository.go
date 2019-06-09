@@ -10,13 +10,13 @@ import (
 	"github.com/google/wire"
 )
 
-var Set = wire.NewSet(ProvideTaskRepository)
+var Set = wire.NewSet(NewTaskRepository)
 
 type TaskRepository struct {
 	Conn *sql.DB
 }
 
-func ProvideTaskRepository(conn *sql.DB) repository.TaskRepository {
+func NewTaskRepository(conn *sql.DB) repository.TaskRepository {
 	return &TaskRepository{Conn: conn}
 }
 

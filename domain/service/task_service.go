@@ -9,7 +9,7 @@ import (
 	"github.com/google/wire"
 )
 
-var Set = wire.NewSet(ProvideTaskService)
+var Set = wire.NewSet(NewTaskService)
 
 type TaskService interface {
 	SyncJira(ctx context.Context, existedTasks []*model.Task) ([]*model.Task, error)
@@ -19,7 +19,7 @@ type taskService struct {
 	*client.JiraClient
 }
 
-func ProvideTaskService(c *client.JiraClient) TaskService {
+func NewTaskService(c *client.JiraClient) TaskService {
 	return &taskService{c}
 }
 

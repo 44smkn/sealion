@@ -11,7 +11,7 @@ import (
 	"github.com/google/wire"
 )
 
-var Set = wire.NewSet(ProvideTaskUseCase)
+var Set = wire.NewSet(NewTaskUseCase)
 
 type TaskUseCase interface {
 	GetTasks(ctx context.Context) ([]*model.Task, error)
@@ -25,7 +25,7 @@ type taskUseCase struct {
 	service.TaskService
 }
 
-func ProvideTaskUseCase(r repository.TaskRepository, s service.TaskService) TaskUseCase {
+func NewTaskUseCase(r repository.TaskRepository, s service.TaskService) TaskUseCase {
 	return &taskUseCase{r, s}
 }
 

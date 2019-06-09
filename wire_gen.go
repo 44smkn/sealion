@@ -21,13 +21,13 @@ func initialize() (handler.TaskHandler, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskRepository := datastore.ProvideTaskRepository(db)
+	taskRepository := datastore.NewTaskRepository(db)
 	jiraClient, err := client.NewJira()
 	if err != nil {
 		return nil, err
 	}
-	taskService := service.ProvideTaskService(jiraClient)
-	taskUseCase := usecase.ProvideTaskUseCase(taskRepository, taskService)
-	taskHandler := handler.ProvideTaskHandler(taskUseCase)
+	taskService := service.NewTaskService(jiraClient)
+	taskUseCase := usecase.NewTaskUseCase(taskRepository, taskService)
+	taskHandler := handler.NewTaskHandler(taskUseCase)
 	return taskHandler, nil
 }

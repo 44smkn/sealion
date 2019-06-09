@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"log"
 	"os"
 	"sealion/domain/model"
 	"sealion/domain/repository"
@@ -34,7 +33,7 @@ func (u *taskUseCase) GetTasks(ctx context.Context) ([]*model.Task, error) {
 		existedTasks, _ := u.GetTickets(ctx)
 		jira, err := u.SyncJira(ctx, existedTasks)
 		if err != nil {
-			log.Println(err)
+			return nil, err
 		}
 		for _, j := range jira {
 			_, err := u.Add(ctx, *j)

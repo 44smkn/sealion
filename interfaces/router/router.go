@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"sealion/interfaces/handler"
 
-	//"sealion/registry"
-
 	"github.com/gorilla/mux"
 )
 

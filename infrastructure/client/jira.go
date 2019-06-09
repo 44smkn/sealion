@@ -14,6 +14,7 @@ import (
 
 	"github.com/google/wire"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var Set = wire.NewSet(NewJira)
@@ -89,8 +90,8 @@ func (c *JiraClient) GetMyIssue(ctx context.Context) ([]model.Issue, error) {
 		return nil, errors.Wrapf(err, "failed to request jira issues api")
 	}
 	req.URL.RawQuery = q.Encode()
-	fmt.Println(req.URL.Path, req.URL.RawQuery)
-	fmt.Println(req.Header)
+	logrus.Debugf("path: %v, query: %v\n", req.URL.Path, req.URL.RawQuery)
+	logrus.Debugf("header: %v\n", req.Header)
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {

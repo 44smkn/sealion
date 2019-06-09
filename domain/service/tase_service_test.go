@@ -2,8 +2,6 @@ package service_test
 
 import (
 	"context"
-	"log"
-	"os"
 	"sealion/domain/model"
 	"sealion/domain/service"
 	"sealion/infrastructure/client"
@@ -12,12 +10,9 @@ import (
 
 func TestSyncJira(t *testing.T) {
 
-	baseUrl := os.Getenv("JIRA_BASE_URL")
-	username := os.Getenv("JIRA_USERNAME")
-	password := os.Getenv("JIRA_PASSWORD")
-	c, err := client.NewJira(baseUrl, username, password)
+	c, err := client.NewJira()
 	if err != nil {
-		log.Println(err)
+		t.Error(err)
 	}
 	s := service.NewTaskService(c)
 	ctx := context.Background()

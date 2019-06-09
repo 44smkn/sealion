@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"sealion/domain/model"
 	"sealion/infrastructure/client"
 
@@ -26,7 +25,7 @@ func NewTaskService(c *client.JiraClient) TaskService {
 func (s *taskService) SyncJira(ctx context.Context, existedTasks []*model.Task) ([]*model.Task, error) {
 	issues, err := s.GetMyIssue(ctx)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 	var tasks []*model.Task
 	for _, i := range issues {

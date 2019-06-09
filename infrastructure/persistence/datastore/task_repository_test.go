@@ -3,7 +3,6 @@ package datastore_test
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"sealion/config"
 	"sealion/domain/model"
 	"sealion/infrastructure/persistence/datastore"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/sirupsen/logrus"
 )
 
 var createTable = `
@@ -49,7 +49,7 @@ func TestGetAll(t *testing.T) {
 	tasks, err := r.GetAll(ctx)
 	check(err)
 
-	fmt.Println(tasks)
+	logrus.Debugf("tasks: %v\n", tasks)
 	expected := newExpectedData()
 	for i := 0; i < len(expected); i++ {
 		if diff := cmp.Diff(tasks[i], expected[i]); diff != "" {

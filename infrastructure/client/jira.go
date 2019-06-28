@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptrace"
 	"net/url"
 	"os"
 	"path"
@@ -34,12 +35,17 @@ type auth struct {
 }
 
 func NewJira() (*JiraClient, error) {
+
+	if os.Getenv("SYNC_JIRA_ISSUE") != "on" {
+		return &JiraClient{}, nil
+	}
+
 	urlStr := os.Getenv("JIRA_BASE_URL")
 	username := os.Getenv("JIRA_USERNAME")
 	password := os.Getenv("JIRA_PASSWORD")
 
 	if len(username) == 0 {
-		return nil, errors.New("missing  username")
+		return nil, errors.New("missing username")
 	}
 
 	if len(password) == 0 {
@@ -71,7 +77,16 @@ func (c *JiraClient) newRequest(ctx context.Context, method, spath string, body 
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
+	trace := &httptrace.ClientTrace{
+		GotConn: func(connInfo httptrace.GotConnInfo) {
+			fmt.Printf("Got Conn: %+v\n", connInfo)
+		},
+		DNSDone: func(dnsInfo httptrace.DNSDoneInfo) {
+			fmt.Printf("DNS Info: %+v\n", dnsInfo)
+		},
+	}
+
+	req = req.WithContext(httptrace.WithClientTrace(ctx, trace))
 
 	req.Header.Set("Content-Type", "application/json")
 	setCookie(ctx, req, c)

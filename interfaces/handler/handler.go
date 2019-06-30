@@ -8,8 +8,9 @@ import (
 	"sealion/domain/model"
 	"strconv"
 
+	"github.com/go-chi/chi"
+
 	"github.com/google/wire"
-	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
@@ -64,8 +65,7 @@ func (h taskHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (h taskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	vars := mux.Vars(r)
-	id, _ := strconv.ParseInt(vars["id"], 0, 64)
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 0, 64)
 	err := h.u.DeleteTask(ctx, id)
 	if err != nil {
 		logrus.Errorf("failed to delete task.\ndetails: \n%v \n", err)

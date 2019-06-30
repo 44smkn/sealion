@@ -5,17 +5,18 @@ import (
 	"net/http"
 	"sealion/interfaces/handler"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi"
 )
 
 func Run(port int, th handler.TaskHandler) error {
 
-	r := mux.NewRouter()
-	r.HandleFunc("/api/tasks", th.Get).Methods("GET")
-	r.HandleFunc("/api/tasks", th.Create).Methods("POST")
-	r.HandleFunc("/api/tasks", th.Update).Methods("PUT")
-	r.HandleFunc("/api/tasks/{id}", th.Delete).Methods("DELETE")
-	http.Handle("/", r)
+	r := chi.NewRouter()
+	r.Route("/api/tasks", func(r chi.Router) {
+		r.Get("/", th.Get)
+		r.Post("/", th.Create)
+		r.Put("/", th.Update)
+		r.Delete("/{id}", th.Delete)
+	})
 
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), r)
 }

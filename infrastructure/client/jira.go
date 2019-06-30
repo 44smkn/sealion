@@ -18,8 +18,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var Set = wire.NewSet(NewJira)
-
 type JiraClient struct {
 	URL        *url.URL
 	HTTPClient *http.Client
@@ -34,22 +32,10 @@ type auth struct {
 	} `json:"session"`
 }
 
-func NewJira() (*JiraClient, error) {
+func NewJira(username, password, urlStr string) (*JiraClient, error) {
 
-	if os.Getenv("SYNC_JIRA_ISSUE") != "on" {
-		return &JiraClient{}, nil
-	}
-
-	urlStr := os.Getenv("JIRA_BASE_URL")
-	username := os.Getenv("JIRA_USERNAME")
-	password := os.Getenv("JIRA_PASSWORD")
-
-	if len(username) == 0 {
-		return nil, errors.New("missing username")
-	}
-
-	if len(password) == 0 {
-		return nil, errors.New("missing user password")
+	if len(username) == 0 || len(password) == 0 {
+		return nil, errors.New("missing username or password")
 	}
 
 	parsedURL, err := url.ParseRequestURI(urlStr)
@@ -66,7 +52,6 @@ func NewJira() (*JiraClient, error) {
 		HTTPClient: httpClient,
 	}
 	return client, nil
-
 }
 
 func (c *JiraClient) newRequest(ctx context.Context, method, spath string, body io.Reader) (*http.Request, error) {

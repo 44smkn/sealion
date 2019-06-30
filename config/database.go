@@ -9,7 +9,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-var Set = wire.NewSet(GetDbConn)
+var Set = wire.NewSet(GetDbConn, NewJiraClient)
 
 type DbConfig struct {
 	User     string `default:"root"`

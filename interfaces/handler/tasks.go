@@ -17,6 +17,8 @@ import (
 var Set = wire.NewSet(NewTaskHandler)
 
 type TaskHandler interface {
+	Routes() chi.Router
+
 	Get(w http.ResponseWriter, r *http.Request)
 	Create(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
@@ -29,6 +31,16 @@ type taskHandler struct {
 
 func NewTaskHandler(u usecase.TaskUseCase) TaskHandler {
 	return &taskHandler{u: u}
+}
+
+func (h taskHandler) Routes() chi.Router {
+	r := chi.NewRouter()
+	r.Get("/", h.Get)
+	r.Post("/", h.Create)
+	r.Put("/", h.Update)
+	r.Delete("/{id}", h.Delete)
+
+	return r 
 }
 
 func (h taskHandler) Get(w http.ResponseWriter, r *http.Request) {

@@ -13,7 +13,7 @@ require (
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/google/go-cmp v0.3.0
 	github.com/google/pprof v0.0.0-20190515194954-54271f7e092f // indirect
-	github.com/google/wire v0.2.2
+	github.com/google/wire v0.3.0
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/gorilla/mux v1.7.2
 	github.com/grpc-ecosystem/grpc-gateway v1.9.2 // indirect
@@ -22,7 +22,6 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.5 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
-	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/peterh/liner v1.1.0 // indirect

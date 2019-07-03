@@ -9,7 +9,6 @@ import (
 	"sealion/application/usecase"
 	"sealion/config"
 	"sealion/domain/service"
-	"sealion/infrastructure/client"
 	"sealion/infrastructure/persistence/datastore"
 	"sealion/interfaces/handler"
 )
@@ -22,7 +21,7 @@ func initialize() (handler.TaskHandler, error) {
 		return nil, err
 	}
 	taskRepository := datastore.NewTaskRepository(db)
-	jiraClient, err := client.NewJira()
+	jiraClient, err := config.NewJiraClient()
 	if err != nil {
 		return nil, err
 	}

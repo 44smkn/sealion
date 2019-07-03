@@ -6,7 +6,6 @@ import (
 	"sealion/application/usecase"
 	"sealion/config"
 	"sealion/domain/service"
-	"sealion/infrastructure/client"
 	"sealion/infrastructure/persistence/datastore"
 	"sealion/interfaces/handler"
 
@@ -19,7 +18,6 @@ func initialize() (th handler.TaskHandler, err error) {
 		config.Set,
 		handler.Set,
 		usecase.Set,
-		client.Set,
 		service.Set,
 		datastore.Set,
 	)
